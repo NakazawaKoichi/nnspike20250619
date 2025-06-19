@@ -1,12 +1,12 @@
 # LEGO type:standard slot:2 autostart
 """Main controlling program for LEGO Spike Prime Hub"""
 import gc
-import hub  # type: ignore
+import hub# type: ignore
 import time
-import uasyncio  # type: ignore
+import uasyncio# type: ignore
 
-MAX_IDLE_TIME = 120000  # Maximum idle time, unit: millisecond
-MAX_RUN_TIME = 600  # Maximum running time, unit: second
+MAX_IDLE_TIME = 120000# Maximum idle time, unit: millisecond
+MAX_RUN_TIME = 600# Maximum running time, unit: second
 
 # Command ID list
 COMMAND_SET_MOTOR_FORWARD_POWER_ID = 201
@@ -45,8 +45,8 @@ class LegoSpike(object):
         hub.display.show(
             hub.Image.ALL_CLOCKS, delay=400, clear=True, wait=False, loop=True, fade=0
         )
-        hub.motion.align_to_model(hub.TOP, hub.FRONT)  # GYRO, orientation
-        hub.motion.yaw_pitch_roll(0)  # yaw, pitch and roll
+        hub.motion.align_to_model(hub.TOP, hub.FRONT)# GYRO, orientation
+        hub.motion.yaw_pitch_roll(0)# yaw, pitch and roll
 
         # Set ports
         self.motor_arm = getattr(hub.port, PORT_MAP["motor_arm"]).motor
@@ -77,16 +77,16 @@ class LegoSpike(object):
 
         """Read command from USB and return the command ID and parameters."""
         if self.usb.any():
-            data = self.usb.read(6)  # Increased to read "ET:" + 3 bytes command data
+            data = self.usb.read(6)# Increased to read "ET:" + 3 bytes command data
 
             flag_pos = data.find(CMD_FLAG)
 
             if (
                 flag_pos >= 0 and len(data) >= flag_pos + 6
-            ):  # Ensure we have enough bytes
+            ):# Ensure we have enough bytes
                 raw_bytes = data[
                     flag_pos + 3 : flag_pos + 6
-                ]  # Extract the 3 bytes after "CF:"
+                ]# Extract the 3 bytes after "CF:"
                 command_id = int.from_bytes(raw_bytes[0:1], "big")
                 command_parameter1 = int.from_bytes(raw_bytes[1:2], "big")
                 command_parameter2 = int.from_bytes(raw_bytes[2:3], "big")
@@ -135,19 +135,15 @@ class LegoSpike(object):
         """
         self.command_counter = time.ticks_ms()
 
-        if action == 0:  # Move down
+        if action == 0:# Move down
             # Move arm down by 90 degrees
-            self.motor_arm.run_for_degrees(
-                degrees=-90, speed=50, stop=self.motor_arm.STOP_HOLD
-            )
-        elif action == 1:  # Move up
+            self.motor_arm.run_at_speed(50)
+        elif action == 1:# Move up
             # Move arm up by 90 degrees
-            self.motor_arm.run_for_degrees(
-                degrees=90, speed=50, stop=self.motor_arm.STOP_HOLD
-            )
+            self.motor_arm.run_at_speed(-50)
 
         # Set the current position as the new reference point
-        #pself.motor_arm.preset(0)
+        #self.motor_arm.preset(0)
 
 
 async def receiver():
